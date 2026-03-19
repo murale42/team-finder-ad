@@ -13,7 +13,7 @@
     <div class="project-header">
         <h2 class="project-title">Актуальные проекты</h2>
         {% if projects %}
-            <a href="/projects/create-project" class="black-button">+ Создать проект</a>
+            <a href="{% url 'projects:create' %}" class="black-button">+ Создать проект</a>
         {% endif %}
     </div>
     <p class="project-subtitle">Найдите интересный проект и присоединитесь к команде</p>
@@ -22,11 +22,52 @@
         {% for project in projects %}
         {% include 'includes/project-card.html' %}
         {% empty %}
-        {% include 'includes/empty-project-card.html' with empty_title="Пока нет проектов" empty_message="Создавайте проекты и делитесь ими с другими пользователями!" button_link="/projects/create-project" button_text="+ Создать проект" %}
+        {% url 'projects:create' as create_url %}
+        {% include 'includes/empty-project-card.html' with empty_title="Пока нет проектов" empty_message="Создавайте проекты и делитесь ими с другими пользователями!" button_link=create_url button_text="+ Создать проект" %}
         {% endfor %}
     </div>
+
+    {% if page_obj.has_other_pages %}
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+            <a href="?page=1" class="pagination__link pagination__link--first" title="Первая страница">
+                <span class="pagination__arrow">&laquo;</span>
+            </a>
+            <a href="?page={{ page_obj.previous_page_number }}" class="pagination__link pagination__link--prev" title="Предыдущая">
+                <span class="pagination__arrow">&lsaquo;</span>
+            </a>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+            {% if num == page_obj.number %}
+                <span class="pagination__current">{{ num }}</span>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                <a href="?page={{ num }}" class="pagination__link">{{ num }}</a>
+            {% elif num == 1 and page_obj.number > 4 %}
+                <a href="?page=1" class="pagination__link">1</a>
+                {% if page_obj.number > 5 %}
+                    <span class="pagination__dots">...</span>
+                {% endif %}
+            {% elif num == page_obj.paginator.num_pages and page_obj.number < page_obj.paginator.num_pages|add:'-3' %}
+                {% if page_obj.number < page_obj.paginator.num_pages|add:'-4' %}
+                    <span class="pagination__dots">...</span>
+                {% endif %}
+                <a href="?page={{ page_obj.paginator.num_pages }}" class="pagination__link">{{ page_obj.paginator.num_pages }}</a>
+            {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}" class="pagination__link pagination__link--next" title="Следующая">
+                <span class="pagination__arrow">&rsaquo;</span>
+            </a>
+            <a href="?page={{ page_obj.paginator.num_pages }}" class="pagination__link pagination__link--last" title="Последняя страница">
+                <span class="pagination__arrow">&raquo;</span>
+            </a>
+        {% endif %}
+    </div>
+    {% endif %}
+
     {% include 'includes/project-fav-toggle.js' %}
 </div>
-
 {% endblock %}
 {% endwith %}
