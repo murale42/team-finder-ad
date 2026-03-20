@@ -1,11 +1,18 @@
 from django.contrib.auth import login, logout, update_session_auth_hash
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import redirect
 from django.urls import reverse_lazy, reverse
 from django.views.generic import FormView, ListView, DetailView, UpdateView
 from django.views import View
+
+from team_finder.constants import (
+    PROJECTS_PER_PAGE,
+    FILTER_OWNERS_OF_FAVORITE_PROJECTS,
+    FILTER_OWNERS_OF_PARTICIPATING_PROJECTS,
+    FILTER_INTERESTED_IN_MY_PROJECTS,
+    FILTER_PARTICIPANTS_OF_MY_PROJECTS,
+)
 from users.forms import LoginForm, RegisterForm, UserProfileForm
 from users.models import User
 
@@ -88,24 +95,24 @@ class ParticipantsListView(ListView):
     model = User
     template_name = "users/participants.html"
     context_object_name = "participants"
-    paginate_by = 12
+    paginate_by = PROJECTS_PER_PAGE
 
     def get_queryset(self):
         queryset = super().get_queryset()
         active_filter = self.request.GET.get("filter")
 
         if self.request.user.is_authenticated and active_filter:
-            if active_filter == "owners-of-favorite-projects":
+            if active_filter == FILTER_OWNERS_OF_FAVORITE_PROJECTS:
                 queryset = User.objects.filter(
                     owned_projects__in=self.request.user.favorites.all()
                 )
-            elif active_filter == "owners-of-participating-projects":
+            elif active_filter == FILTER_OWNERS_OF_PARTICIPATING_PROJECTS:
                 queryset = User.objects.filter(
                     owned_projects__in=self.request.user.participated_projects.all()
                 )
-            elif active_filter == "interested-in-my-projects":
+            elif active_filter == FILTER_INTERESTED_IN_MY_PROJECTS:
                 queryset = User.objects.filter(favorites__owner=self.request.user)
-            elif active_filter == "participants-of-my-projects":
+            elif active_filter == FILTER_PARTICIPANTS_OF_MY_PROJECTS:
                 queryset = User.objects.filter(
                     participated_projects__owner=self.request.user
                 )

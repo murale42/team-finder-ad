@@ -1,4 +1,5 @@
 from http import HTTPStatus
+
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.http import JsonResponse, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect
@@ -7,9 +8,10 @@ from django.views import View
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from django.views.decorators.http import require_POST
 from django.utils.decorators import method_decorator
+
 from projects.forms import ProjectForm
 from projects.models import Project
-from team_finder.constants import PROJECT_STATUS_OPEN, PROJECT_STATUS_CLOSED
+from team_finder.constants import PROJECTS_PER_PAGE, PROJECT_STATUS_OPEN, PROJECT_STATUS_CLOSED
 
 
 # Список проектов
@@ -17,7 +19,7 @@ class ProjectListView(ListView):
     model = Project
     template_name = "projects/project_list.html"
     context_object_name = "projects"
-    paginate_by = 12
+    paginate_by = PROJECTS_PER_PAGE
 
     def get_queryset(self):
         return (
@@ -39,11 +41,14 @@ class ProjectDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         project = self.object
+        owner_in_participants = project.participants.filter(pk=project.owner_id).exists()
         participants = list(project.participants.all())
-        if all(m.id != project.owner_id for m in participants):
+        if not owner_in_participants:
             participants.append(project.owner)
+        participants_count = project.participants.count() + (0 if owner_in_participants else 1)
         context["project_participants"] = participants
-        context["participants_count"] = len(participants)
+        context["participants_count"] = participants_count
+
         return context
 
 
@@ -144,7 +149,7 @@ class ToggleFavoriteView(LoginRequiredMixin, View):
 class FavoritesListView(LoginRequiredMixin, ListView):
     template_name = "projects/favorite_projects.html"
     context_object_name = "projects"
-    paginate_by = 12
+    paginate_by = PROJECTS_PER_PAGE
 
     def get_queryset(self):
         return (

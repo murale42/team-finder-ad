@@ -10,6 +10,7 @@ from django.core.validators import MaxLengthValidator
 from django.db import models
 from django.utils import timezone
 from PIL import Image, ImageDraw, ImageFont
+
 from team_finder.constants import (
     USER_NAME_MAX_LENGTH,
     USER_SURNAME_MAX_LENGTH,

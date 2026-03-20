@@ -40,3 +40,8 @@ AVATAR_BACKGROUND_COLORS = [
     AVATAR_COLOR_ORANGE,
     AVATAR_COLOR_DARK,
 ]
+
+FILTER_OWNERS_OF_FAVORITE_PROJECTS = "owners-of-favorite-projects"
+FILTER_OWNERS_OF_PARTICIPATING_PROJECTS = "owners-of-participating-projects"
+FILTER_INTERESTED_IN_MY_PROJECTS = "interested-in-my-projects"
+FILTER_PARTICIPANTS_OF_MY_PROJECTS = "participants-of-my-projects"

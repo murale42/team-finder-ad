@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth import authenticate
+
 from team_finder.constants import USER_NAME_MAX_LENGTH, USER_SURNAME_MAX_LENGTH
 from team_finder.validators import validate_github_url
 from users.models import User
