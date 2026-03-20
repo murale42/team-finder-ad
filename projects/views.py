@@ -11,7 +11,11 @@ from django.utils.decorators import method_decorator
 
 from projects.forms import ProjectForm
 from projects.models import Project
-from team_finder.constants import PROJECTS_PER_PAGE, PROJECT_STATUS_OPEN, PROJECT_STATUS_CLOSED
+from team_finder.constants import (
+    PROJECTS_PER_PAGE,
+    PROJECT_STATUS_OPEN,
+    PROJECT_STATUS_CLOSED,
+)
 
 
 # Список проектов
@@ -41,11 +45,15 @@ class ProjectDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         project = self.object
-        owner_in_participants = project.participants.filter(pk=project.owner_id).exists()
+        owner_in_participants = project.participants.filter(
+            pk=project.owner_id
+        ).exists()
         participants = list(project.participants.all())
         if not owner_in_participants:
             participants.append(project.owner)
-        participants_count = project.participants.count() + (0 if owner_in_participants else 1)
+        participants_count = project.participants.count() + (
+            0 if owner_in_participants else 1
+        )
         context["project_participants"] = participants
         context["participants_count"] = participants_count
 
